@@ -17,7 +17,7 @@ sealed interface BencodeValue {
 
 class StringBencodeValue(val value: ByteArray): BencodeValue {
     override fun toJSON(): String = gson.toJson(asString())
-    private fun asString(): String = value.toString(Charset.defaultCharset())
+    fun asString(): String = value.toString(Charset.defaultCharset())
 }
 
 class IntegerBencodeValue(val value: BigInteger): BencodeValue {

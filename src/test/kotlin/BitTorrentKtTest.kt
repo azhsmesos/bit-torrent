@@ -29,4 +29,11 @@ class BitTorrentKtTest {
         val msg5 = decode(s5)
         assertEquals(msg5,"{\"foo\":\"bar\",\"hello\":52}")
     }
+
+    // bt 种子 https://www.dyg5.com/file-49231.html
+    @Test
+    fun metaInfoTest() {
+        val info = metaInfo("src/main/resources/test.torrent")
+        println("info: " + toJSON(info))
+    }
 }

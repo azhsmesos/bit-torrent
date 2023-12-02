@@ -67,10 +67,10 @@ object BencodeParser {
                 } + END_TAG_TAG
 
         fun decodeDictionary(value: DictBencodeValue) = byteArrayOf(DICTIONARY_TAG.code.toByte()) +
-                value.values.map {
-                    toBencode(value)
-                }.reduce { acc, bytes ->
-                    acc + bytes
+                value.values.map { (key, value) ->
+                    toBencode(key.toBencodeValue()) + toBencode(value)
+                }.reduce { acc, arr ->
+                    acc + arr
                 } + END_TAG_TAG
     }
 

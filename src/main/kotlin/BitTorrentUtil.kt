@@ -1,4 +1,5 @@
 import bencode.BencodeValue
+import com.google.gson.Gson
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -26,6 +27,12 @@ inline fun <reified T: BencodeValue> BencodeValue.asType(): T = if (this !is T) 
     throw MismatchedTypeException(T::class, this)
 } else {
     this
+}
+
+private val gson = Gson()
+
+fun toJSON(obj: Any): String {
+    return gson.toJson(obj)
 }
 
 
