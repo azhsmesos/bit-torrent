@@ -9,7 +9,6 @@ import bencode.DictBencodeValue
 import bencode.IntegerBencodeValue
 import bencode.StringBencodeValue
 import java.io.File
-import java.io.FileFilter
 import java.security.MessageDigest
 
 /**

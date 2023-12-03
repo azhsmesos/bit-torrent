@@ -35,4 +35,15 @@ fun toJSON(obj: Any): String {
     return gson.toJson(obj)
 }
 
+fun bytesToHex(bytes: ByteArray): String {
+    val hexChars = "0123456789ABCDEF".toCharArray()
+    val result = StringBuilder(bytes.size * 2)
+    for (byte in bytes) {
+        val i = byte.toInt() and 0xFF
+        result.append(hexChars[i shr 4])
+        result.append(hexChars[i and 0x0F])
+    }
+    return result.toString()
+}
+
 

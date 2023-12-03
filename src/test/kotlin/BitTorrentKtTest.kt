@@ -36,4 +36,16 @@ class BitTorrentKtTest {
         val info = metaInfo("src/main/resources/test.torrent")
         println("info: " + toJSON(info))
     }
+
+    @Test
+    fun sendPeersTest() {
+        val list = sendPeers("src/main/resources/test.torrent")
+        println("list: $list")
+    }
+
+    @Test
+    fun handShakeTest() {
+        val list = handShake("src/main/resources/test.torrent", "localhost:8080")
+        println("list: $list")
+    }
 }
