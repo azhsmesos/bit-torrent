@@ -1,7 +1,8 @@
 package peer
 
 import metainfo.MetaInfo
-import java.math.BigInteger.ZERO
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 /**
  * @author zhaozhenhang <zhaozhenhang@kuaishou.com>
@@ -10,7 +11,7 @@ import java.math.BigInteger.ZERO
 
 private const val MAX_PARTIAL_PIECE_LENGTH = 16384 // 2^14
 
-class ConnectionManager (val metaInfo: MetaInfo, peers: List<Peer>) {
+class ConnectionManager(val metaInfo: MetaInfo, peers: List<Peer>) {
     val connections: Map<Int, PeerConnection>
     val workQueue = mutableListOf<PeerPartialPieceRequest>()
     val receivedPiece = mutableListOf<PeerPartialPieceResponse>()
@@ -36,8 +37,36 @@ class ConnectionManager (val metaInfo: MetaInfo, peers: List<Peer>) {
     fun download() {
         val peers = connections.values
         val threads = peers.map {
-            it.do
+            thread(start = true) {
+                it.download({ getNextItem() }) { downloaded ->
+                    synchronized(receivedPiece) {
+                        receivedPiece.add(downloaded)
+                    }
+                }
+            }
         }
+        while (threads.any {
+            it.isAlive
+            }) {
+            // 防止cpu空轮训
+            TimeUnit.MICROSECONDS.sleep(1)
+        }
+    }
+
+    fun getPiece(pieceNumber: Int): ByteArray {
+        val ret = ByteArray(getLengthOfPiece(pieceNumber)?:0)
+        receivedPiece.filter {
+            it.pieceIndex == pieceNumber
+        }.sortedBy {
+            it.begin
+        }.forEach {
+            System.arraycopy(it.bytes, 0, ret, it.begin, it.bytes.size)
+        }
+        return ret
+    }
+
+    private fun getNextItem(): PeerPartialPieceRequest? = synchronized(lock) {
+        workQueue.removeFirstOrNull()
     }
 
     private fun getRequest(pieceIndex: Int): List<PeerPartialPieceRequest> {

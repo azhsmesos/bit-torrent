@@ -6,6 +6,7 @@ import peer.ConnectionManager
 import peer.Peer
 import peer.PeerConnection
 import peer.TrackerManager
+import java.io.File
 import java.io.StringReader
 
 fun main(args: Array<String>) {
@@ -52,4 +53,8 @@ fun downloadPiece(outputFilename: String, metaInfoFilename: String, pieceNumber:
     connectionManager.connect()
     connectionManager.requestPiece(pieceNumber)
     connectionManager.download()
+    val piece = connectionManager.getPiece(pieceNumber)
+    val file = File(outputFilename)
+    file.writeBytes(piece)
+    println("Piece $pieceNumber downloaded to $outputFilename")
 }

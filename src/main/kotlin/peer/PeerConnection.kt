@@ -113,11 +113,25 @@ class PeerConnection(peer: Peer) {
     }
 
     private fun sendRequest(item: PeerPartialPieceRequest) {
-        // todo 这儿
+        // 发送请求
+         val buf = ByteBuffer.allocate(12)
+             .order(ByteOrder.BIG_ENDIAN)
+             .putInt(item.pieceIndex)
+             .putInt(item.begin)
+             .putInt(item.length)
+        sendMessage(PeerMessage(PeerMessageType.REQUEST, buf.toArray()))
+        requestInFlight++
     }
 
     private fun readPiece(saveResponse: (PeerPartialPieceResponse) -> Boolean) {
-
+        val piece = waitFor(PeerMessageType.PIECE)
+        val response = PeerPartialPieceResponse(
+            piece.payload.copyOfRange(0, 4).toInt(),
+            piece.payload.copyOfRange(4, 8).toInt(),
+            piece.payload.copyOfRange(8, piece.payload.size)
+        )
+        saveResponse(response)
+        requestInFlight--
     }
 
     private enum class PeerMessageType(val protocolType: Int) {
